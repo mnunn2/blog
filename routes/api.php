@@ -31,3 +31,4 @@ Route::delete('article/{id}', 'ArticleController@destroy');
 Route::get('categories', 'CategoryController@index');
 Route::get('category/{id}', 'CategoryController@show');
 Route::post('category', 'CategoryController@store');
+Route::delete('category/{id}', 'CategoryController@destroy');

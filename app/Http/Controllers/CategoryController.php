@@ -10,40 +10,60 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class CategoryController extends Controller
 {
-    protected $category;
+    protected $catRepo;
 
     public function __construct(CategoryRepository $category)
     {
-        $this->category = $category;
+        $this->catRepo = $category;
     }
 
-    public function index()//: ResourceCollection
+    /**
+     * @return ResourceCollection
+     */
+    public function index(): ResourceCollection
     {
-        $categories = $this->category->getAll();
+        $categories = $this->catRepo->getAll();
         $categoryCollection = CategoryResource::collection($categories);
         return $categoryCollection;
     }
 
+    /**
+     * @param Request $request
+     * @return CategoryResource
+     */
     public function store(Request $request): CategoryResource
     {
         $newCategory = new Category($request->all());
-        $createdCategory = $this->category->insertLastChild($newCategory);
+        $createdCategory = $this->catRepo->insertLastChild($newCategory);
         return new CategoryResource($createdCategory);
     }
 
+    /**
+     * @param int $id
+     * @return CategoryResource
+     */
     public function show(int $id): CategoryResource
     {
-        $category = $this->category->find($id);
+        $category = $this->catRepo->find($id);
         return new CategoryResource($category);
     }
 
+    /**
+     * @param Request $request
+     * @param Category $category
+     */
     public function update(Request $request, Category $category)
     {
         //
     }
 
-    public function destroy(int $id): ResourceCollection
+    /**
+     * @param int $id
+     * @return CategoryResource
+     */
+    public function destroy(int $id): CategoryResource
     {
-
+        $deletedCategory = $this->catRepo->deleteCategory($id);
+        return new CategoryResource($deletedCategory);
     }
 }

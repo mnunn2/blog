@@ -7,10 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class CategoryRepository
 {
-    /**
-     * @var $cat
-     */
-    protected $cat;
 
     public function getAll()
     {
@@ -24,21 +20,33 @@ class CategoryRepository
 
     public function insertLastChild(category $newCat): Category
     {
-        $this->cat = $newCat;
-        $parent = $this->find($this->cat->parentId);
-        $this->cat->lft = $parent->rgt;
-        $this->cat->rgt = ($parent->rgt + 1);
-        $this->cat->rootId = ($parent->rootId);
-        $this->cat->depth = ($parent->depth + 1);
+        $parent = $this->find($newCat->parentId);
+        $newCat->lft = $parent->rgt;
+        $newCat->rgt = ($parent->rgt + 1);
+        $newCat->rootId = ($parent->rootId);
+        $newCat->depth = ($parent->depth + 1);
 
-        DB::transaction(function () use ($parent) {
+        DB::transaction(function () use ($parent, $newCat) {
 
             $this->shiftNodes($parent->rgt, 2, $parent->rootId);
-            $this->cat->save();
+            $newCat->save();
 
         }, 3);
 
-        return $this->cat;
+        return $newCat;
+    }
+
+    public function deleteCategory(int $id): Category
+    {
+        $cat = $this->find($id);
+
+        DB::transaction(function () use ($cat) {
+
+            $cat->delete();
+            $this->shiftNodes($cat->lft, ($cat->lft - $cat->rgt - 1), $cat->rootId);
+
+        }, 3);
+        return $cat;
     }
 
     protected function shiftNodes(int $lowest, int $delta, int $root): void
