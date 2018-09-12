@@ -31,9 +31,24 @@ class CategoryController extends Controller
      * @param Request $request
      * @return CategoryResource
      */
-    public function store(Request $request): CategoryResource
+    public function firstChild(Request $request): CategoryResource
     {
+        // build a new category with the params of the request body
         $newCategory = new Category($request->all());
+
+        $createdCategory = $this->catRepo->insertFirstChild($newCategory);
+        return new CategoryResource($createdCategory);
+    }
+
+    /**
+     * @param Request $request
+     * @return CategoryResource
+     */
+    public function lastChild(Request $request): CategoryResource
+    {
+        // build a new category with the params of the request body
+        $newCategory = new Category($request->all());
+
         $createdCategory = $this->catRepo->insertLastChild($newCategory);
         return new CategoryResource($createdCategory);
     }

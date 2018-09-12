@@ -30,5 +30,6 @@ Route::delete('article/{id}', 'ArticleController@destroy');
  */
 Route::get('categories', 'CategoryController@index');
 Route::get('category/{id}', 'CategoryController@show');
-Route::post('category', 'CategoryController@store');
+Route::post('category/last-child', 'CategoryController@lastChild');
+Route::post('category/first-child', 'CategoryController@firstChild');
 Route::delete('category/{id}', 'CategoryController@destroy');

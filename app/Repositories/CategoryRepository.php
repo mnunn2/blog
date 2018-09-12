@@ -18,6 +18,24 @@ class CategoryRepository
         return Category::findOrFail($id);
     }
 
+    public function insertFirstChild(category $newCat): Category
+    {
+        $parent = $this->find($newCat->parentId);
+        $newCat->lft = $parent->lft +1;
+        $newCat->rgt = ($parent->lft + 2);
+        $newCat->rootId = ($parent->rootId);
+        $newCat->depth = ($parent->depth + 1);
+
+        DB::transaction(function () use ($parent, $newCat) {
+
+            $this->shiftNodes(($parent->lft + 1), 2, $parent->rootId);
+            $newCat->save();
+
+        }, 3);
+
+        return $newCat;
+    }
+
     public function insertLastChild(category $newCat): Category
     {
         $parent = $this->find($newCat->parentId);
