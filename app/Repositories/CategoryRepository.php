@@ -18,6 +18,44 @@ class CategoryRepository
         return Category::findOrFail($id);
     }
 
+    public function insertBefore(category $newCat, int $beforeId): Category
+    {
+        $before = $this->find($beforeId);
+        $newCat->lft = $before->lft;
+        $newCat->rgt = ($before->rgt);
+        $newCat->rootId = ($before->rootId);
+        $newCat->depth = ($before->depth);
+        $newCat->parentId = ($before->parentId);
+
+        DB::transaction(function () use ($before, $newCat) {
+
+            $this->shiftNodes(($before->lft), 2, $before->rootId);
+            $newCat->save();
+
+        }, 3);
+
+        return $newCat;
+    }
+
+    public function insertAfter(category $newCat, int $afterId): Category
+    {
+        $after = $this->find($afterId);
+        $newCat->lft = $after->rgt + 1;
+        $newCat->rgt = ($after->rgt + 2);
+        $newCat->rootId = ($after->rootId);
+        $newCat->depth = ($after->depth);
+        $newCat->parentId = ($after->parentId);
+
+        DB::transaction(function () use ($after, $newCat) {
+
+            $this->shiftNodes(($after->rgt + 1), 2, $after->rootId);
+            $newCat->save();
+
+        }, 3);
+
+        return $newCat;
+    }
+
     public function insertFirstChild(category $newCat): Category
     {
         $parent = $this->find($newCat->parentId);

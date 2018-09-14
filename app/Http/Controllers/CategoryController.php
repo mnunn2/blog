@@ -31,6 +31,34 @@ class CategoryController extends Controller
      * @param Request $request
      * @return CategoryResource
      */
+    public function before(Request $request): CategoryResource
+    {
+        // build a new category with the params of the request body
+        $newCategory = new Category($request->all());
+        $beforeId = $request->beforeId;
+
+        $createdCategory = $this->catRepo->insertBefore($newCategory, $beforeId);
+        return new CategoryResource($createdCategory);
+    }
+
+    /**
+     * @param Request $request
+     * @return CategoryResource
+     */
+    public function after(Request $request): CategoryResource
+    {
+        // build a new category with the params of the request body
+        $newCategory = new Category($request->all());
+        $afterId = $request->afterId;
+
+        $createdCategory = $this->catRepo->insertAfter($newCategory, $afterId);
+        return new CategoryResource($createdCategory);
+    }
+
+    /**
+     * @param Request $request
+     * @return CategoryResource
+     */
     public function firstChild(Request $request): CategoryResource
     {
         // build a new category with the params of the request body
